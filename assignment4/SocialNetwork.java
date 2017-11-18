@@ -45,13 +45,18 @@ public class SocialNetwork {
             while(in.hasNext()){
                 String word = in.next();
                 if(isName(word)){
-                    String name = toName(word);
-                    if(followerCount.containsKey(name)){
-                        Integer num = followerCount.get(name);
-                        followerCount.put(name, new Integer(num.intValue() + 1));
-                    } else {
-                        followerCount.put(name, new Integer(1));
+                    // adjust to name being an ArrayList
+
+                    List<String> names = toName(word);
+                    for(String name: names){
+                        if(followerCount.containsKey(name)){
+                           Integer num = followerCount.get(name);
+                            followerCount.put(name, new Integer(num.intValue() + 1));
+                        } else {
+                            followerCount.put(name, new Integer(1));
+                        }
                     }
+                    
                 }
             }
             
@@ -81,29 +86,87 @@ private static boolean isName(String word){
     if(i == -1){
         return false;
     }
-    if(i > 0){
-        if(isValidChar(word.charAt(i-1))){
-            return false;
+    // if(i > 0){
+    //     if(isValidChar(word.charAt(i-1))){
+    //         return false;
+    //     }
+    // }
+    // if(i + 1 < word.length()){
+    //     if(!isValidChar(word.charAt(i+1))){
+    //         return false;
+    //     }
+    // }
+    // // is a name
+    // return true;
+
+    // ???
+    for(int j = 0; j < word.length() - 1; j++){
+        if(word.charAt(j) == '@'){
+            if(i > 0){
+                if(!isValidChar(word.charAt(i - 1))){                    
+                    if(isValidChar(word.charAt(i + 1))){
+                        return true;
+                    }                    
+                }
+            } else {
+                if(i + 1 < word.length()){
+                    if(isValidChar(word.charAt(i + 1))){
+                        return true;
+                    }
+                }
+                
+            }
+            
         }
     }
-    if(i + 1 < word.length()){
-        if(!isValidChar(word.charAt(i+1))){
-            return false;
-        }
-    }
-    // is a name
-    return true;
-    
+    return false;
 }
-private static String toName(String word){
-    int i = word.indexOf('@');
-    int j;
-    for(j = i + 1; j < word.length(); j++){
-        if(!isValidChar(word.charAt(j))){
+private static List<String> toName(String word){
+    // int i = word.indexOf('@');
+    // int j;
+    // for(j = i + 1; j < word.length(); j++){
+    //     if(!isValidChar(word.charAt(j))){
+    //         break;
+    //     }
+    // }
+    // return word.substring(i + 1, j);
+    List<String> names = new ArrayList<>();
+    for (int i = 0; i < word.length(); i++) {
+        if(word.charAt(i) == '@'){
+            if(i > 0){
+                if(!isValidChar(word.charAt(i - 1))){
+                    if(i + 1 < word.length()){
+                        if(isValidChar(word.charAt(i + 1))){
+                            i = extractName(names, i, word);
+                        } 
+                    }
+                }
+            } else {
+                if(i + 1 < word.length()){
+                    if(isValidChar(word.charAt(i + 1))){
+                        i = extractName(names, i, word);
+                    }
+                }
+            }
+        }
+    }
+    return names;
+}
+
+private static int extractName(List<String> names, int i, String word){
+    int beg;
+    int end;
+    i++;
+    beg = i;
+    while(i < word.length()){
+        if(!isValidChar(word.charAt(i))){
             break;
         }
+        i++;
     }
-    return word.substring(i + 1, j);
+    end = i;
+    names.add(word.substring(beg, end));
+    return i;
 }
 private static boolean isValidChar(char c){
     if(!Character.isLetter(c)){
@@ -129,6 +192,9 @@ private static boolean isValidChar(char c){
         HashMap<String, HashSet<String>> m = baseLayer(tweets);
         Set<String> k = m.keySet();
         for(String name: k){
+            Set<String> soloName = new HashSet<>();
+            soloName.add(name);
+            result.add(soloName);
             name = name.toLowerCase();
             List<String> l = new ArrayList<>(m.get(name));// m[name].values
             int iterations = powTwo(l.size());
@@ -178,10 +244,16 @@ private static boolean isValidChar(char c){
             while(in.hasNext()){
                 String word = in.next();
                 if(isName(word)){
-                    String mention = toName(word);
-                    if(!mention.equals(name)){
-                        h.add(mention);
+                    // adjust to ArrayList
+
+                    List<String> mentions = toName(word);
+
+                    for(String mention: mentions){
+                        if(!mention.equals(name)){
+                           h.add(mention);
+                        }
                     }
+                    
                         
                 }
             }                //h.add(name);

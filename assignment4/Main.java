@@ -2,6 +2,8 @@ package assignment4;
 
 import java.time.Instant;
 import java.util.Arrays;
+import java.util.Set;
+
 import java.util.List;
 // javac -cp ".:jackson-databind-2.9.2.jar:jackson-annotations-2.9.2.jar:jackson-core-2.9.2.jar" assignment4/*.java 
 // java -cp ".:jackson-core-2.9.2.jar:jackson-databind-2.9.2.jar:jackson-annotations-2.9.2.jar" assignment4.Main
@@ -41,5 +43,7 @@ public class Main {
 
         List<String> names = SocialNetwork.findKMostFollower(tweetsList, 5);
         System.out.println(names);
+        List<Set<String>> cliques = SocialNetwork.findCliques(tweetsList);
+        System.out.println(cliques);
     }
 }
